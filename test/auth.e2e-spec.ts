@@ -1,16 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import request from 'supertest';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { AuthModule } from '../src/modules/auth/auth.module';
-import { UsersModule } from '../src/modules/users/users.module';
-import appConfig from '../src/config/app.config';
-import databaseConfig from '../src/config/database.config';
-import jwtConfig from '../src/config/jwt.config';
-import { globalValidationPipe } from '../src/common/pipes/validation.pipe';
-import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
+import { INestApplication } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { EventEmitterModule } from '@nestjs/event-emitter'
+import { Test, TestingModule } from '@nestjs/testing'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import request from 'supertest'
+import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter'
+import { globalValidationPipe } from '../src/common/pipes/validation.pipe'
+import appConfig from '../src/config/app.config'
+import databaseConfig from '../src/config/database.config'
+import jwtConfig from '../src/config/jwt.config'
+import { AuthModule } from '../src/modules/auth/auth.module'
+import { UsersModule } from '../src/modules/users/users.module'
 
 /**
  * Teste E2E de autenticação.
@@ -22,14 +22,14 @@ import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter
  * Comando: npm run test:e2e
  */
 describe('Auth (E2E)', () => {
-  let app: INestApplication;
+  let app: INestApplication
   const testUser = {
     name: 'E2E User',
     email: `e2e_${Date.now()}@test.com`,
     phone: `119${Math.floor(10000000 + Math.random() * 89999999)}`,
     password: 'Senha@123',
-  };
-  let accessToken: string;
+  }
+  let accessToken: string
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -56,18 +56,18 @@ describe('Auth (E2E)', () => {
         AuthModule,
         UsersModule,
       ],
-    }).compile();
+    }).compile()
 
-    app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(globalValidationPipe);
-    app.useGlobalFilters(new HttpExceptionFilter());
-    await app.init();
-  });
+    app = moduleFixture.createNestApplication()
+    app.setGlobalPrefix('api/v1')
+    app.useGlobalPipes(globalValidationPipe)
+    app.useGlobalFilters(new HttpExceptionFilter())
+    await app.init()
+  })
 
   afterAll(async () => {
-    await app.close();
-  });
+    await app.close()
+  })
 
   // ── POST /auth/register ────────────────────────────────────────────────────
 
@@ -76,34 +76,31 @@ describe('Auth (E2E)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/register')
         .send(testUser)
-        .expect(201);
+        .expect(201)
 
-      expect(res.body).toHaveProperty('data');
-      expect(res.body.data).toHaveProperty('accessToken');
-      expect(res.headers['set-cookie']).toBeDefined();
-    });
+      expect(res.body).toHaveProperty('data')
+      expect(res.body.data).toHaveProperty('accessToken')
+      expect(res.headers['set-cookie']).toBeDefined()
+    })
 
     it('deve retornar 409 ao registrar email duplicado', async () => {
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send(testUser)
-        .expect(409);
-    });
+      await request(app.getHttpServer()).post('/api/v1/auth/register').send(testUser).expect(409)
+    })
 
     it('deve retornar 400 com email inválido', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/auth/register')
         .send({ ...testUser, email: 'nao_e_email' })
-        .expect(400);
-    });
+        .expect(400)
+    })
 
     it('deve retornar 400 com senha muito curta', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/auth/register')
         .send({ ...testUser, email: 'outro@test.com', password: '123' })
-        .expect(400);
-    });
-  });
+        .expect(400)
+    })
+  })
 
   // ── POST /auth/login ───────────────────────────────────────────────────────
 
@@ -112,26 +109,26 @@ describe('Auth (E2E)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: testUser.email, password: testUser.password })
-        .expect(200);
+        .expect(200)
 
-      expect(res.body.data).toHaveProperty('accessToken');
-      accessToken = res.body.data.accessToken;
-    });
+      expect(res.body.data).toHaveProperty('accessToken')
+      accessToken = res.body.data.accessToken
+    })
 
     it('deve retornar 401 com senha errada', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: testUser.email, password: 'SenhaErrada' })
-        .expect(401);
-    });
+        .expect(401)
+    })
 
     it('deve retornar 401 com email não cadastrado', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: 'nao@existe.com', password: 'Senha@123' })
-        .expect(401);
-    });
-  });
+        .expect(401)
+    })
+  })
 
   // ── GET /auth/me ───────────────────────────────────────────────────────────
 
@@ -140,29 +137,29 @@ describe('Auth (E2E)', () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/auth/me')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200);
+        .expect(200)
 
-      expect(res.body.data.email).toBe(testUser.email);
-      expect(res.body.data).not.toHaveProperty('passwordHash');
-    });
+      expect(res.body.data.email).toBe(testUser.email)
+      expect(res.body.data).not.toHaveProperty('passwordHash')
+    })
 
     it('deve retornar 401 sem token', async () => {
-      await request(app.getHttpServer()).get('/api/v1/auth/me').expect(401);
-    });
+      await request(app.getHttpServer()).get('/api/v1/auth/me').expect(401)
+    })
 
     it('deve retornar 401 com token inválido', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/auth/me')
         .set('Authorization', 'Bearer token_invalido')
-        .expect(401);
-    });
-  });
+        .expect(401)
+    })
+  })
 
   // ── POST /auth/logout ──────────────────────────────────────────────────────
 
   describe('POST /api/v1/auth/logout', () => {
     it('deve limpar cookie de refresh e retornar 204', async () => {
-      await request(app.getHttpServer()).post('/api/v1/auth/logout').expect(204);
-    });
-  });
-});
+      await request(app.getHttpServer()).post('/api/v1/auth/logout').expect(204)
+    })
+  })
+})

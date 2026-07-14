@@ -1,14 +1,8 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
-import { ChatService } from './chat.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { SwaggerResponses } from '../../common/swagger/responses';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'
+import { ChatService } from './chat.service'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 const MESSAGE_EXAMPLE = {
   id: 'uuid',
@@ -17,7 +11,7 @@ const MESSAGE_EXAMPLE = {
   content: 'Olá, estou a caminho!',
   readAt: null,
   createdAt: '2026-07-11T10:00:00.000Z',
-};
+}
 
 @ApiTags('chat')
 @ApiBearerAuth()
@@ -42,6 +36,6 @@ export class ChatController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.notFound('Sala de chat'))
   getMessages(@Param('requestId') requestId: string) {
-    return this.service.findRoom(requestId).then((r) => this.service.getMessages(r.id));
+    return this.service.findRoom(requestId).then((r) => this.service.getMessages(r.id))
   }
 }

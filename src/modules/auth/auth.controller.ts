@@ -8,7 +8,7 @@ import {
   HttpStatus,
   UseGuards,
   Get,
-} from '@nestjs/common';
+} from '@nestjs/common'
 import {
   ApiTags,
   ApiOperation,
@@ -16,23 +16,23 @@ import {
   ApiResponse,
   ApiCookieAuth,
   ApiBody,
-} from '@nestjs/swagger';
-import type { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
-import { SwaggerResponses } from '../../common/swagger/responses';
+} from '@nestjs/swagger'
+import type { Request, Response } from 'express'
+import { AuthService } from './auth.service'
+import { RegisterDto } from './dto/register.dto'
+import { LoginDto } from './dto/login.dto'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { User } from '../users/entities/user.entity'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
-const REFRESH_COOKIE = 'refresh_token';
+const REFRESH_COOKIE = 'refresh_token'
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict' as const,
   maxAge: 7 * 24 * 60 * 60 * 1000,
-};
+}
 
 @ApiTags('auth')
 @Controller('auth')
@@ -56,9 +56,9 @@ export class AuthController {
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.conflict('Email já cadastrado.'))
   async register(@Body() dto: RegisterDto, @Res() res: Response) {
-    const tokens = await this.authService.register(dto);
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS);
-    return res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
+    const tokens = await this.authService.register(dto)
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
+    return res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken })
   }
 
   // ── POST /auth/login ───────────────────────────────────────────────────────
@@ -67,8 +67,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Login',
-    description:
-      'Valida credenciais, define cookie `refresh_token` e retorna `accessToken`.',
+    description: 'Valida credenciais, define cookie `refresh_token` e retorna `accessToken`.',
   })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
@@ -79,9 +78,9 @@ export class AuthController {
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
   async login(@Body() dto: LoginDto, @Res() res: Response) {
-    const tokens = await this.authService.login(dto);
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS);
-    return res.json({ accessToken: tokens.accessToken });
+    const tokens = await this.authService.login(dto)
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
+    return res.json({ accessToken: tokens.accessToken })
   }
 
   // ── POST /auth/refresh ─────────────────────────────────────────────────────
@@ -101,10 +100,10 @@ export class AuthController {
   })
   @ApiResponse(SwaggerResponses.unauthorized)
   async refresh(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE] as string | undefined;
-    const tokens = await this.authService.refresh(refreshToken ?? '');
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS);
-    return res.json({ accessToken: tokens.accessToken });
+    const refreshToken = req.cookies?.[REFRESH_COOKIE] as string | undefined
+    const tokens = await this.authService.refresh(refreshToken ?? '')
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
+    return res.json({ accessToken: tokens.accessToken })
   }
 
   // ── POST /auth/logout ──────────────────────────────────────────────────────
@@ -117,8 +116,8 @@ export class AuthController {
   })
   @ApiResponse(SwaggerResponses.noContent)
   logout(@Res() res: Response) {
-    res.clearCookie(REFRESH_COOKIE);
-    return res.sendStatus(HttpStatus.NO_CONTENT);
+    res.clearCookie(REFRESH_COOKIE)
+    return res.sendStatus(HttpStatus.NO_CONTENT)
   }
 
   // ── GET /auth/me ───────────────────────────────────────────────────────────
@@ -128,7 +127,8 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Usuário autenticado',
-    description: 'Retorna os dados do usuário dono do `accessToken`. Campo `passwordHash` é excluído.',
+    description:
+      'Retorna os dados do usuário dono do `accessToken`. Campo `passwordHash` é excluído.',
   })
   @ApiResponse({
     status: 200,
@@ -146,6 +146,6 @@ export class AuthController {
   })
   @ApiResponse(SwaggerResponses.unauthorized)
   me(@CurrentUser() user: User) {
-    return user;
+    return user
   }
 }

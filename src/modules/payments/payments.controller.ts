@@ -1,23 +1,35 @@
 import {
-  Controller, Get, Post, Body, Param, UseGuards,
-  Req, HttpCode, Headers,
-} from '@nestjs/common';
-import type { RawBodyRequest } from '@nestjs/common';
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+  HttpCode,
+  Headers,
+} from '@nestjs/common'
+import type { RawBodyRequest } from '@nestjs/common'
 import {
-  ApiTags, ApiBearerAuth, ApiOperation, ApiResponse,
-  ApiParam, ApiBody, ApiExcludeEndpoint,
-} from '@nestjs/swagger';
-import type { Request } from 'express';
-import { PaymentsService } from './payments.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
-import { ProfessionalsService } from '../professionals/professionals.service';
-import { SwaggerResponses } from '../../common/swagger/responses';
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger'
+import type { Request } from 'express'
+import { PaymentsService } from './payments.service'
+import { CreatePaymentDto } from './dto/create-payment.dto'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { RolesGuard } from '../../common/guards/roles.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../../common/enums/role.enum'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { User } from '../users/entities/user.entity'
+import { ProfessionalsService } from '../professionals/professionals.service'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 const PAYMENT_EXAMPLE = {
   id: 'uuid',
@@ -31,7 +43,7 @@ const PAYMENT_EXAMPLE = {
   manualPixKeyType: null,
   receiptAttachmentId: null,
   professionalConfirmedAt: null,
-};
+}
 
 const PIX_PAYMENT_EXAMPLE = {
   ...PAYMENT_EXAMPLE,
@@ -40,7 +52,7 @@ const PIX_PAYMENT_EXAMPLE = {
   stripeClientSecret: null,
   manualPixKey: '000.000.000-00',
   manualPixKeyType: 'cpf',
-};
+}
 
 @ApiTags('payments')
 @Controller('payments')
@@ -60,8 +72,8 @@ export class PaymentsController {
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') sig: string,
   ) {
-    await this.paymentsService.handleStripeWebhook(req.rawBody as Buffer, sig);
-    return { received: true };
+    await this.paymentsService.handleStripeWebhook(req.rawBody as Buffer, sig)
+    return { received: true }
   }
 
   // ── POST /payments ─────────────────────────────────────────────────────────
@@ -77,23 +89,27 @@ export class PaymentsController {
       '**PIX manual (`manual_pix`):** salva o snapshot da chave PIX do profissional e aguarda o cliente enviar o comprovante via `POST /payments/:requestId/pix-receipt`.',
   })
   @ApiBody({ type: CreatePaymentDto })
-  @ApiResponse({ status: 201, description: 'Pagamento iniciado.', schema: { example: PAYMENT_EXAMPLE } })
+  @ApiResponse({
+    status: 201,
+    description: 'Pagamento iniciado.',
+    schema: { example: PAYMENT_EXAMPLE },
+  })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   async create(@Body() dto: CreatePaymentDto, @CurrentUser() _user: User) {
     // Para PIX manual, busca a chave PIX do profissional da solicitação
-    let pixKey: string | undefined;
-    let pixKeyType: string | undefined;
+    let pixKey: string | undefined
+    let pixKeyType: string | undefined
 
-    if (dto.method === 'manual_pix' as any) {
+    if (dto.method === ('manual_pix' as any)) {
       // professionalId vem da solicitação — buscado no service via requestId
-      const profile = await this.professionalsService.findByRequestId(dto.requestId);
-      pixKey     = profile?.pixKey     ?? undefined;
-      pixKeyType = profile?.pixKeyType ?? undefined;
+      const profile = await this.professionalsService.findByRequestId(dto.requestId)
+      pixKey = profile?.pixKey ?? undefined
+      pixKeyType = profile?.pixKeyType ?? undefined
     }
 
-    return this.paymentsService.createPayment(0, dto, pixKey, pixKeyType);
+    return this.paymentsService.createPayment(0, dto, pixKey, pixKeyType)
   }
 
   // ── POST /payments/:requestId/pix-receipt ──────────────────────────────────
@@ -115,7 +131,11 @@ export class PaymentsController {
       type: 'object',
       required: ['attachmentId'],
       properties: {
-        attachmentId: { type: 'string', description: 'UUID do attachment com o comprovante', example: 'uuid' },
+        attachmentId: {
+          type: 'string',
+          description: 'UUID do attachment com o comprovante',
+          example: 'uuid',
+        },
       },
     },
   })
@@ -132,7 +152,7 @@ export class PaymentsController {
     @Param('requestId') requestId: string,
     @Body('attachmentId') attachmentId: string,
   ) {
-    return this.paymentsService.submitPixReceipt(requestId, attachmentId);
+    return this.paymentsService.submitPixReceipt(requestId, attachmentId)
   }
 
   // ── POST /payments/:requestId/confirm-pix ──────────────────────────────────
@@ -167,7 +187,7 @@ export class PaymentsController {
   @ApiResponse(SwaggerResponses.forbidden)
   @ApiResponse(SwaggerResponses.notFound('Pagamento'))
   async confirmPix(@Param('requestId') requestId: string, @CurrentUser() user: User) {
-    return this.paymentsService.confirmPixByProfessional(requestId, user.id);
+    return this.paymentsService.confirmPixByProfessional(requestId, user.id)
   }
 
   // ── GET /payments ──────────────────────────────────────────────────────────
@@ -177,11 +197,15 @@ export class PaymentsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Listar todos os pagamentos (admin)' })
-  @ApiResponse({ status: 200, description: 'Lista de pagamentos.', schema: { example: [PAYMENT_EXAMPLE] } })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de pagamentos.',
+    schema: { example: [PAYMENT_EXAMPLE] },
+  })
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   findAll() {
-    return this.paymentsService.findAllPayments();
+    return this.paymentsService.findAllPayments()
   }
 
   // ── GET /payments/transactions ─────────────────────────────────────────────
@@ -199,7 +223,7 @@ export class PaymentsController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   findTransactions() {
-    return this.paymentsService.findAllTransactions();
+    return this.paymentsService.findAllTransactions()
   }
 
   // ── POST /payments/:requestId/release ──────────────────────────────────────
@@ -237,6 +261,6 @@ export class PaymentsController {
     @Param('requestId') requestId: string,
     @Body('professionalStripeAccountId') stripeAccountId: string,
   ) {
-    return this.paymentsService.releaseEscrow(requestId, stripeAccountId);
+    return this.paymentsService.releaseEscrow(requestId, stripeAccountId)
   }
 }

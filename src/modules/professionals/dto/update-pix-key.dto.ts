@@ -1,6 +1,6 @@
-import { IsEnum, IsString, Length, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PixKeyType } from '../entities/professional-profile.entity';
+import { IsEnum, IsString, Length } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { PixKeyType } from '../entities/professional-profile.entity'
 
 export class UpdatePixKeyDto {
   @ApiProperty({
@@ -9,7 +9,7 @@ export class UpdatePixKeyDto {
     example: PixKeyType.CPF,
   })
   @IsEnum(PixKeyType)
-  pixKeyType: PixKeyType;
+  pixKeyType: PixKeyType
 
   @ApiProperty({
     description: 'Valor da chave PIX. Formato depende do tipo (ex.: 000.000.000-00 para CPF).',
@@ -17,7 +17,7 @@ export class UpdatePixKeyDto {
   })
   @IsString()
   @Length(1, 255)
-  pixKey: string;
+  pixKey: string
 }
 
 export class RemovePixKeyDto {

@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Payment } from './entities/payment.entity';
-import { Transaction } from './entities/transaction.entity';
-import { PaymentsService } from './payments.service';
-import { PaymentsController } from './payments.controller';
-import { ProfessionalsModule } from '../professionals/professionals.module';
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Payment } from './entities/payment.entity'
+import { Transaction } from './entities/transaction.entity'
+import { PaymentsService } from './payments.service'
+import { PaymentsController } from './payments.controller'
+import { ProfessionalsModule } from '../professionals/professionals.module'
 
 @Module({
   imports: [

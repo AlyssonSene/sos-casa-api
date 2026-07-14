@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Delete } from '@nestjs/common'
 import {
   ApiTags,
   ApiBearerAuth,
@@ -6,16 +6,16 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-} from '@nestjs/swagger';
-import { ServicesService } from './services.service';
-import { CreateServiceDto, UpsertProfessionalServiceDto } from './dto/create-service.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
-import { SwaggerResponses } from '../../common/swagger/responses';
+} from '@nestjs/swagger'
+import { ServicesService } from './services.service'
+import { CreateServiceDto, UpsertProfessionalServiceDto } from './dto/create-service.dto'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { RolesGuard } from '../../common/guards/roles.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../../common/enums/role.enum'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { User } from '../users/entities/user.entity'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 const SERVICE_EXAMPLE = {
   id: 'uuid',
@@ -25,7 +25,7 @@ const SERVICE_EXAMPLE = {
   isPriceVariable: false,
   estimatedDurationMinutes: 60,
   isActive: true,
-};
+}
 
 const PROF_SERVICE_EXAMPLE = {
   id: 'uuid',
@@ -33,7 +33,7 @@ const PROF_SERVICE_EXAMPLE = {
   serviceId: 'uuid',
   price: 8000,
   service: SERVICE_EXAMPLE,
-};
+}
 
 @ApiTags('services')
 @Controller('services')
@@ -45,7 +45,8 @@ export class ServicesController {
   @Get()
   @ApiOperation({
     summary: 'Listar serviços disponíveis',
-    description: 'Retorna serviços ativos. Filtrar por categoria via `categoryId`. Endpoint público.',
+    description:
+      'Retorna serviços ativos. Filtrar por categoria via `categoryId`. Endpoint público.',
   })
   @ApiQuery({ name: 'categoryId', required: false, description: 'UUID da categoria para filtrar' })
   @ApiResponse({
@@ -54,7 +55,7 @@ export class ServicesController {
     schema: { example: [SERVICE_EXAMPLE] },
   })
   findAll(@Query('categoryId') categoryId?: string) {
-    return this.service.findAll(categoryId);
+    return this.service.findAll(categoryId)
   }
 
   // ── GET /services/:id ──────────────────────────────────────────────────────
@@ -62,10 +63,14 @@ export class ServicesController {
   @Get(':id')
   @ApiOperation({ summary: 'Detalhar serviço' })
   @ApiParam({ name: 'id', description: 'UUID do serviço' })
-  @ApiResponse({ status: 200, description: 'Dados do serviço.', schema: { example: SERVICE_EXAMPLE } })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do serviço.',
+    schema: { example: SERVICE_EXAMPLE },
+  })
   @ApiResponse(SwaggerResponses.notFound('Serviço'))
   findOne(@Param('id') id: string) {
-    return this.service.findById(id);
+    return this.service.findById(id)
   }
 
   // ── POST /services (admin) ─────────────────────────────────────────────────
@@ -75,12 +80,16 @@ export class ServicesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Criar serviço (admin)' })
-  @ApiResponse({ status: 201, description: 'Serviço criado.', schema: { example: SERVICE_EXAMPLE } })
+  @ApiResponse({
+    status: 201,
+    description: 'Serviço criado.',
+    schema: { example: SERVICE_EXAMPLE },
+  })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   create(@Body() dto: CreateServiceDto) {
-    return this.service.create(dto);
+    return this.service.create(dto)
   }
 
   // ── PATCH /services/:id (admin) ────────────────────────────────────────────
@@ -91,13 +100,17 @@ export class ServicesController {
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Atualizar serviço (admin)' })
   @ApiParam({ name: 'id', description: 'UUID do serviço' })
-  @ApiResponse({ status: 200, description: 'Serviço atualizado.', schema: { example: SERVICE_EXAMPLE } })
+  @ApiResponse({
+    status: 200,
+    description: 'Serviço atualizado.',
+    schema: { example: SERVICE_EXAMPLE },
+  })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   @ApiResponse(SwaggerResponses.notFound('Serviço'))
   update(@Param('id') id: string, @Body() dto: Partial<CreateServiceDto>) {
-    return this.service.update(id, dto);
+    return this.service.update(id, dto)
   }
 
   // ── GET /services/professional/my ──────────────────────────────────────────
@@ -118,7 +131,7 @@ export class ServicesController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   myServices(@CurrentUser() user: User) {
-    return this.service.findProfessionalServices(user.id);
+    return this.service.findProfessionalServices(user.id)
   }
 
   // ── POST /services/professional/my ─────────────────────────────────────────
@@ -142,7 +155,7 @@ export class ServicesController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   upsertMyService(@CurrentUser() user: User, @Body() dto: UpsertProfessionalServiceDto) {
-    return this.service.upsertProfessionalService(user.id, dto);
+    return this.service.upsertProfessionalService(user.id, dto)
   }
 
   // ── DELETE /services/professional/my/:serviceId ────────────────────────────
@@ -157,6 +170,6 @@ export class ServicesController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   removeMyService(@CurrentUser() user: User, @Param('serviceId') serviceId: string) {
-    return this.service.removeProfessionalService(user.id, serviceId);
+    return this.service.removeProfessionalService(user.id, serviceId)
   }
 }

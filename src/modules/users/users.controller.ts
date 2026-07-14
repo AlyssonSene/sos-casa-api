@@ -1,17 +1,11 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
-import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
-import { SwaggerResponses } from '../../common/swagger/responses';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'
+import { UsersService } from './users.service'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { RolesGuard } from '../../common/guards/roles.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../../common/enums/role.enum'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -24,7 +18,8 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Buscar usuário por ID (admin)',
-    description: 'Retorna dados completos do usuário. O campo `passwordHash` é sempre excluído da resposta.',
+    description:
+      'Retorna dados completos do usuário. O campo `passwordHash` é sempre excluído da resposta.',
   })
   @ApiParam({ name: 'id', description: 'UUID do usuário' })
   @ApiResponse({
@@ -48,6 +43,6 @@ export class UsersController {
   @ApiResponse(SwaggerResponses.forbidden)
   @ApiResponse(SwaggerResponses.notFound('Usuário'))
   findOne(@Param('id') id: string) {
-    return this.usersService.findById(id);
+    return this.usersService.findById(id)
   }
 }
