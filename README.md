@@ -2,7 +2,7 @@
 
 Backend da plataforma SOS Casa: API REST + WebSocket responsável pela regra de negócio, autenticação, solicitações de serviço, chat, pagamentos e notificações que conectam clientes a profissionais autônomos de reparos residenciais.
 
-Ver documentação completa do produto e dos três repositórios em [`../README.md`](../README.md).
+Este é o backend do ecossistema SOS Casa, composto por três aplicações: esta API (NestJS), o Admin Web (React, painel operacional da equipe interna) e o app mobile (Expo, cliente e profissional).
 
 ---
 
@@ -16,10 +16,23 @@ Ver documentação completa do produto e dos três repositórios em [`../README.
 | Socket.io | WebSockets para chat em tempo real |
 | JWT + Passport | Autenticação stateless |
 | class-validator | Validação de DTOs |
-| Pagar.me SDK (Node.js) | Gateway de pagamentos (PIX + cartão + split marketplace) |
+| Stripe SDK (Node.js) | Gateway de pagamentos (cartão + PIX via Stripe + split automático via Connect) |
 | S3 / MinIO | Storage de fotos e documentos (a definir) |
 
-Detalhes de módulos e fluxos: [`../docs/api-plan.md`](../docs/api-plan.md). Estrutura de pastas: [`../docs/estrutura-modulos.md`](../docs/estrutura-modulos.md).
+---
+
+## Estrutura de pastas
+
+```
+src/
+├── main.ts
+├── app.module.ts
+├── config/          # database.config.ts, jwt.config.ts, app.config.ts
+├── common/          # decorators, guards, filters, interceptors, pipes, enums
+└── modules/         # um módulo por domínio (auth, users, service-requests, ...)
+```
+
+Cada módulo segue o padrão Nest: `*.module.ts`, `*.controller.ts`, `*.service.ts`, `dto/`.
 
 ---
 
@@ -37,9 +50,10 @@ Preencha as variáveis em `.env`:
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` | Conexão com PostgreSQL |
 | `JWT_ACCESS_SECRET`, `JWT_ACCESS_EXPIRES_IN` | Access token (padrão 15min) |
 | `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN` | Refresh token (padrão 7 dias) |
-| `PAGARME_API_KEY`, `PAGARME_ENCRYPTION_KEY` | Credenciais do gateway de pagamento |
+| `STRIPE_SECRET_KEY` | Chave secreta da conta Stripe (sk_live_... ou sk_test_...) |
+| `STRIPE_WEBHOOK_SECRET` | Segredo para validar eventos recebidos pelo webhook Stripe |
 | `STORAGE_BUCKET`, `STORAGE_REGION`, `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY` | Storage de anexos (S3/MinIO — v2) |
-| `APP_URL` | URL pública, usada nos webhooks do Pagar.me |
+| `APP_URL` | URL pública da API (usada como base para callbacks e webhooks) |
 | `CORS_ORIGIN` | Origem liberada para o Admin Web |
 
 `.env.test` já vem preenchido com valores padrão para rodar os testes de integração e E2E localmente (requer um PostgreSQL rodando).
@@ -89,13 +103,28 @@ npm run format
 | `CategoriesModule` / `ServicesModule` | Catálogo padronizado de categorias e serviços |
 | `ServiceRequestsModule` | Fluxo central da solicitação de serviço (criação → conclusão) |
 | `ChatModule` | Mensagens em tempo real via Socket.io por solicitação |
-| `PaymentsModule` | Integração Pagar.me, escrow e repasse ao profissional |
+| `PaymentsModule` | Integração Stripe (cartão + PIX automático), PIX manual, escrow e repasse via Stripe Connect |
 | `ReviewsModule` | Avaliações e atualização de rating do profissional |
 | `AttachmentsModule` | Upload de fotos, documentos e notas fiscais |
 | `NotificationsModule` | Push notifications (Expo) |
 | `AdminModule` | Endpoints administrativos (aprovação, catálogo, comissão) |
 
-Fluxo completo da solicitação de serviço documentado em [`../docs/api-plan.md`](../docs/api-plan.md#fluxo-principal--solicitação-de-serviço).
+### Fluxo principal — solicitação de serviço
+
+```
+1. Cliente cria solicitação (endereço, serviços, descrição, material)
+2. API notifica profissionais na cidade via Socket.io
+3. Profissional aceita → solicitação vai para ACCEPTED
+4. Chat liberado entre as partes
+5. Profissional atualiza status: ON_THE_WAY → ARRIVED → IN_PROGRESS
+6. Profissional marca como COMPLETED
+7. Cliente confirma → CONFIRMED
+8a. [Stripe] Cliente paga via cartão ou PIX Stripe → PaymentIntent confirmado → HELD (escrow)
+8b. [PIX manual] Cliente copia a chave PIX do profissional → paga no próprio banco → envia comprovante → HELD
+9a. [Stripe] Após 24h sem disputa → admin libera escrow → transferência via Stripe Connect (15% comissão) → RELEASED
+9b. [PIX manual] Profissional confirma recebimento no app → RELEASED (sem comissão automática)
+10. Cliente avalia profissional
+```
 
 ---
 
