@@ -92,10 +92,10 @@ describe('ServiceRequestsService (integração)', () => {
 
   afterAll(async () => {
     // Limpa registros criados nos testes
-    if (testRequestId) await requestRepo.delete({ id: testRequestId })
-    if (testAddressId) await addressRepo.delete({ id: testAddressId })
-    if (testClientId) await userRepo.delete({ id: testClientId })
-    await module.close()
+    if (requestRepo && testRequestId) await requestRepo.delete({ id: testRequestId })
+    if (addressRepo && testAddressId) await addressRepo.delete({ id: testAddressId })
+    if (userRepo && testClientId) await userRepo.delete({ id: testClientId })
+    await module?.close()
   })
 
   // ── create ────────────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ describe('ServiceRequestsService (integração)', () => {
     })
 
     afterAll(async () => {
-      await requestRepo.delete({ id: cancelableRequestId })
+      if (requestRepo && cancelableRequestId) await requestRepo.delete({ id: cancelableRequestId })
     })
 
     it('deve cancelar solicitação em PENDING', async () => {

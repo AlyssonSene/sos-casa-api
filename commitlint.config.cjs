@@ -1,5 +1,5 @@
 /** @type {import('@commitlint/types').UserConfig} */
-export default {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     // Enforce English messages — no Portuguese words as type

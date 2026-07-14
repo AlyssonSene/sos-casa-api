@@ -58,7 +58,7 @@ describe('AuthService (integração)', () => {
   })
 
   afterAll(async () => {
-    await module.close()
+    await module?.close()
   })
 
   // ── register ───────────────────────────────────────────────────────────────
