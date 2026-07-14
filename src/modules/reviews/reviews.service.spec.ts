@@ -65,4 +65,20 @@ describe('ReviewsService', () => {
     mockRepo.findOneBy.mockResolvedValue(null)
     await expect(service.remove('nao-existe')).rejects.toThrow(NotFoundException)
   })
+
+  it('deve retornar reviews de um profissional', async () => {
+    mockRepo.find.mockResolvedValue([mockReview])
+    const result = await service.findByProfessional('prof-1')
+    expect(mockRepo.find).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { professionalId: 'prof-1' } }),
+    )
+    expect(result).toHaveLength(1)
+  })
+
+  it('deve retornar todas as reviews', async () => {
+    mockRepo.find.mockResolvedValue([mockReview])
+    const result = await service.findAll()
+    expect(mockRepo.find).toHaveBeenCalled()
+    expect(result).toHaveLength(1)
+  })
 })

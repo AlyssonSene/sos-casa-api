@@ -67,6 +67,13 @@ describe('AddressesService', () => {
       mockRepo.findOneBy.mockResolvedValue(null)
       await expect(service.findById('nao-existe', 'user-1')).rejects.toThrow(NotFoundException)
     })
+
+    it('deve buscar apenas por id quando userId não for informado', async () => {
+      mockRepo.findOneBy.mockResolvedValue(mockAddress)
+      const result = await service.findById('addr-1')
+      expect(mockRepo.findOneBy).toHaveBeenCalledWith({ id: 'addr-1' })
+      expect(result.id).toBe('addr-1')
+    })
   })
 
   describe('create', () => {
@@ -106,6 +113,37 @@ describe('AddressesService', () => {
 
       await service.create('user-1', dto)
       expect(mockRepo.update).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('update', () => {
+    it('deve atualizar endereço e desmarcar isDefault anterior quando isDefault=true', async () => {
+      mockRepo.findOneBy.mockResolvedValue(mockAddress)
+      mockRepo.save.mockResolvedValue({ ...mockAddress, city: 'Nova Cidade', isDefault: true })
+
+      const result = await service.update('addr-1', 'user-1', {
+        city: 'Nova Cidade',
+        isDefault: true,
+      })
+
+      expect(mockRepo.update).toHaveBeenCalledWith({ userId: 'user-1' }, { isDefault: false })
+      expect(mockRepo.save).toHaveBeenCalled()
+      expect(result.city).toBe('Nova Cidade')
+    })
+
+    it('não deve chamar update se isDefault não for definido', async () => {
+      mockRepo.findOneBy.mockResolvedValue(mockAddress)
+      mockRepo.save.mockResolvedValue({ ...mockAddress, city: 'Nova Cidade' })
+
+      await service.update('addr-1', 'user-1', { city: 'Nova Cidade' })
+
+      expect(mockRepo.update).not.toHaveBeenCalled()
+      expect(mockRepo.save).toHaveBeenCalled()
+    })
+
+    it('deve lançar NotFoundException se endereço não encontrado', async () => {
+      mockRepo.findOneBy.mockResolvedValue(null)
+      await expect(service.update('nao-existe', 'user-1', {})).rejects.toThrow(NotFoundException)
     })
   })
 

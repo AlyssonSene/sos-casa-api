@@ -102,9 +102,33 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.ts",
+      "!**/*.module.ts",
+      "!**/*.entity.ts",
+      "!**/*.dto.ts",
+      "!**/*.spec.ts",
+      "!**/*.controller.ts",
+      "!**/main.ts",
+      "!config/**",
+      "!common/decorators/**",
+      "!common/swagger/**",
+      "!common/interceptors/**",
+      "!common/pipes/**",
+      "!common/guards/jwt-auth.guard.ts",
+      "!database/**",
+      "!**/chat.gateway.ts",
+      "!**/responses.ts"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageThreshold": {
+      "global": {
+        "statements": 90,
+        "branches": 80,
+        "functions": 90,
+        "lines": 90
+      }
+    },
+    "testEnvironment": "node",
+    "coverageProvider": "v8"
   }
 }

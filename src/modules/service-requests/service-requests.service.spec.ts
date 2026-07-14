@@ -61,6 +61,29 @@ describe('ServiceRequestsService', () => {
     jest.clearAllMocks()
   })
 
+  describe('findAll', () => {
+    it('deve retornar todas as solicitações sem filtro', async () => {
+      const req = makeRequest(RequestStatus.PENDING)
+      mockRepo.find.mockResolvedValue([req])
+
+      const result = await service.findAll()
+
+      expect(mockRepo.find).toHaveBeenCalledWith(expect.objectContaining({ where: {} }))
+      expect(result).toHaveLength(1)
+    })
+
+    it('deve filtrar por status quando filtro fornecido', async () => {
+      const req = makeRequest(RequestStatus.ACCEPTED)
+      mockRepo.find.mockResolvedValue([req])
+
+      await service.findAll({ status: RequestStatus.ACCEPTED })
+
+      expect(mockRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { status: RequestStatus.ACCEPTED } }),
+      )
+    })
+  })
+
   describe('findById', () => {
     it('deve retornar a solicitação pelo id', async () => {
       mockRepo.findOne.mockResolvedValue(makeRequest(RequestStatus.PENDING))

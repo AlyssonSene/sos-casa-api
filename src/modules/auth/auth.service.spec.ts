@@ -171,5 +171,27 @@ describe('AuthService', () => {
 
       await expect(service.refresh('invalid_token')).rejects.toThrow(UnauthorizedException)
     })
+
+    it('deve lançar UnauthorizedException se usuário não for encontrado durante refresh', async () => {
+      mockJwtService.verify.mockReturnValue({
+        sub: 'uuid-nao-existe',
+        email: 'ghost@test.com',
+        role: Role.CLIENT,
+      })
+      mockUsersService.findById.mockResolvedValue(null)
+
+      await expect(service.refresh('valid_token')).rejects.toThrow(UnauthorizedException)
+    })
+
+    it('deve lançar UnauthorizedException se conta estiver inativa durante refresh', async () => {
+      mockJwtService.verify.mockReturnValue({
+        sub: 'uuid-1',
+        email: 'test@test.com',
+        role: Role.CLIENT,
+      })
+      mockUsersService.findById.mockResolvedValue({ ...mockUser, isActive: false })
+
+      await expect(service.refresh('valid_token')).rejects.toThrow(UnauthorizedException)
+    })
   })
 })
