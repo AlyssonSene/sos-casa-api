@@ -55,10 +55,10 @@ export class AuthController {
   })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.conflict('Email já cadastrado.'))
-  async register(@Body() dto: RegisterDto, @Res() res: Response) {
-    const tokens = await this.authService.register(dto)
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
-    return res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken })
+  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.authService.register(dto)
+    res.cookie(REFRESH_COOKIE, result.refreshToken, COOKIE_OPTIONS)
+    return { accessToken: result.accessToken, user: result.user }
   }
 
   // ── POST /auth/login ───────────────────────────────────────────────────────
@@ -77,10 +77,10 @@ export class AuthController {
   })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
-  async login(@Body() dto: LoginDto, @Res() res: Response) {
-    const tokens = await this.authService.login(dto)
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
-    return res.json({ accessToken: tokens.accessToken })
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.authService.login(dto)
+    res.cookie(REFRESH_COOKIE, result.refreshToken, COOKIE_OPTIONS)
+    return { accessToken: result.accessToken, user: result.user }
   }
 
   // ── POST /auth/refresh ─────────────────────────────────────────────────────
@@ -99,11 +99,11 @@ export class AuthController {
     schema: { example: { accessToken: 'eyJhbGci...' } },
   })
   @ApiResponse(SwaggerResponses.unauthorized)
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.[REFRESH_COOKIE] as string | undefined
-    const tokens = await this.authService.refresh(refreshToken ?? '')
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, COOKIE_OPTIONS)
-    return res.json({ accessToken: tokens.accessToken })
+    const result = await this.authService.refresh(refreshToken ?? '')
+    res.cookie(REFRESH_COOKIE, result.refreshToken, COOKIE_OPTIONS)
+    return { accessToken: result.accessToken }
   }
 
   // ── POST /auth/logout ──────────────────────────────────────────────────────
@@ -115,9 +115,8 @@ export class AuthController {
     description: 'Limpa o cookie `refresh_token`. O `accessToken` expira em até 15min.',
   })
   @ApiResponse(SwaggerResponses.noContent)
-  logout(@Res() res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(REFRESH_COOKIE)
-    return res.sendStatus(HttpStatus.NO_CONTENT)
   }
 
   // ── GET /auth/me ───────────────────────────────────────────────────────────

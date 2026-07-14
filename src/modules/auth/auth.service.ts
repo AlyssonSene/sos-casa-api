@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
+import { instanceToPlain } from 'class-transformer'
 import { UsersService } from '../users/users.service'
 import { Role } from '../../common/enums/role.enum'
 import { RegisterDto } from './dto/register.dto'
@@ -32,7 +33,8 @@ export class AuthService {
       role,
     })
 
-    return this.generateTokens(user.id, user.email, user.role)
+    const tokens = this.generateTokens(user.id, user.email, user.role)
+    return { ...tokens, user: instanceToPlain(user) }
   }
 
   // ─── Login ───────────────────────────────────────────────────────────────────
@@ -46,7 +48,8 @@ export class AuthService {
 
     if (!user.isActive) throw new UnauthorizedException('Account disabled')
 
-    return this.generateTokens(user.id, user.email, user.role)
+    const tokens = this.generateTokens(user.id, user.email, user.role)
+    return { ...tokens, user: instanceToPlain(user) }
   }
 
   // ─── Refresh ─────────────────────────────────────────────────────────────────
@@ -60,7 +63,8 @@ export class AuthService {
       const user = await this.usersService.findById(payload.sub)
       if (!user || !user.isActive) throw new UnauthorizedException()
 
-      return this.generateTokens(user.id, user.email, user.role)
+      const tokens = this.generateTokens(user.id, user.email, user.role)
+      return { ...tokens, user: instanceToPlain(user) }
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token')
     }
