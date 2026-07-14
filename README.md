@@ -36,6 +36,36 @@ Cada módulo segue o padrão Nest: `*.module.ts`, `*.controller.ts`, `*.service.
 
 ---
 
+## Pré-requisitos
+
+- **Node.js 20+** — para rodar a API localmente em modo de desenvolvimento
+- **Docker Engine 24+ + Compose V2** — para banco de dados e ambiente de produção
+- **GNU Make** — para usar os atalhos do `Makefile` na raiz do projeto
+
+---
+
+## Quick Start (desenvolvimento)
+
+O banco de dados é orquestrado pelo repo **`sos-casa-infra`** (clone como irmão deste):
+
+```bash
+# 1. Sobe banco de dev + pgAdmin (no repo sos-casa-infra)
+cd ../sos-casa-infra && make dev
+
+# 2. Neste diretório
+cp .env.example .env        # configure STRIPE_SECRET_KEY etc.
+npm install
+npm run start:dev
+
+# API:     http://localhost:3000/api/v1
+# Swagger: http://localhost:3000/api/docs
+# pgAdmin: http://localhost:5050
+```
+
+> Ver `../sos-casa-infra/README.md` ou `../docs/infra.md` para guia completo.
+
+---
+
 ## Configuração de ambiente
 
 ```bash
@@ -56,7 +86,7 @@ Preencha as variáveis em `.env`:
 | `APP_URL` | URL pública da API (usada como base para callbacks e webhooks) |
 | `CORS_ORIGIN` | Origem liberada para o Admin Web |
 
-`.env.test` já vem preenchido com valores padrão para rodar os testes de integração e E2E localmente (requer um PostgreSQL rodando).
+`.env.test` já vem preenchido com valores padrão para rodar os testes de integração e E2E contra o banco de teste Docker (`DB_PORT=5433`).
 
 ---
 
@@ -77,10 +107,16 @@ npm run start:prod
 ## Testes
 
 ```bash
-npm run test           # unitários
-npm run test:cov       # cobertura
-npm run test:integration
-npm run test:e2e
+# Pela raiz do projeto (recomendado — sobe banco automaticamente):
+make test
+
+# Ou manualmente:
+make test-db                  # sobe banco de teste na porta 5433
+npm run test                  # unitários
+npm run test:cov              # cobertura
+npm run test:integration      # requer banco de teste rodando
+npm run test:e2e              # requer banco de teste rodando
+make test-db-down             # derruba banco de teste
 ```
 
 ## Lint e formatação

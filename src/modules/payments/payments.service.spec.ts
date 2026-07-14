@@ -78,7 +78,7 @@ describe('PaymentsService', () => {
     }).compile();
 
     service = module.get<PaymentsService>(PaymentsService);
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   // ── createPayment ──────────────────────────────────────────────────────────

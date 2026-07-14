@@ -55,7 +55,7 @@ async function bootstrap() {
       .addTag('auth', 'Cadastro, login, logout e renovação de token')
       .addTag('addresses', 'Endereços do usuário')
       .addTag('service-requests', 'Ciclo de vida das solicitações de serviço')
-      .addTag('payments', 'Pagamentos via Pagar.me e controle de escrow')
+      .addTag('payments', 'Pagamentos via Stripe (cartão/PIX) ou PIX manual + controle de escrow')
       .addTag('reviews', 'Avaliações de profissionais')
       .addTag('chat', 'Histórico de mensagens (tempo real via Socket.io)')
       .addTag('professionals', 'Gestão e aprovação de profissionais (admin)')

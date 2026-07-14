@@ -1,0 +1,39 @@
+# Dependências — instaladas no container
+node_modules/
+
+# Build anterior
+dist/
+
+# Variáveis de ambiente — nunca entram na imagem
+.env
+.env.*
+!.env.example
+
+# Cobertura e relatórios de teste
+coverage/
+
+# Arquivos de teste — não pertencem à imagem de produção
+**/*.spec.ts
+**/*.e2e-spec.ts
+**/*.integration.spec.ts
+test/
+
+# Editor e OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker (evita recursão)
+Dockerfile*
+docker-compose*
+.dockerignore
