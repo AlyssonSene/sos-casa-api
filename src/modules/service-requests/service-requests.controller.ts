@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common'
 import {
   ApiTags,
   ApiBearerAuth,
@@ -7,16 +7,16 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
-} from '@nestjs/swagger';
-import { ServiceRequestsService } from './service-requests.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
-import { RequestStatus } from '../../common/enums/request-status.enum';
-import { SwaggerResponses } from '../../common/swagger/responses';
+} from '@nestjs/swagger'
+import { ServiceRequestsService } from './service-requests.service'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { RolesGuard } from '../../common/guards/roles.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../../common/enums/role.enum'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { User } from '../users/entities/user.entity'
+import { RequestStatus } from '../../common/enums/request-status.enum'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 const REQUEST_EXAMPLE = {
   id: 'uuid',
@@ -32,7 +32,7 @@ const REQUEST_EXAMPLE = {
   platformFee: 0,
   total: 0,
   createdAt: '2026-07-11T10:00:00.000Z',
-};
+}
 
 @ApiTags('service-requests')
 @ApiBearerAuth()
@@ -64,7 +64,7 @@ export class ServiceRequestsController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   findAll(@Query('status') status?: RequestStatus) {
-    return this.service.findAll(status ? { status } : undefined);
+    return this.service.findAll(status ? { status } : undefined)
   }
 
   // ── GET /service-requests/:id ──────────────────────────────────────────────
@@ -80,7 +80,7 @@ export class ServiceRequestsController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.notFound('Solicitação'))
   findOne(@Param('id') id: string) {
-    return this.service.findById(id);
+    return this.service.findById(id)
   }
 
   // ── POST /service-requests ─────────────────────────────────────────────────
@@ -116,7 +116,7 @@ export class ServiceRequestsController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   create(@Body() body: Partial<any>, @CurrentUser() user: User) {
-    return this.service.create({ ...body, clientId: user.id });
+    return this.service.create({ ...body, clientId: user.id })
   }
 
   // ── PATCH /service-requests/:id/cancel ────────────────────────────────────
@@ -138,12 +138,14 @@ export class ServiceRequestsController {
   @ApiResponse({
     status: 200,
     description: 'Solicitação cancelada.',
-    schema: { example: { ...REQUEST_EXAMPLE, status: 'cancelled', cancellationReason: 'Mudei de ideia.' } },
+    schema: {
+      example: { ...REQUEST_EXAMPLE, status: 'cancelled', cancellationReason: 'Mudei de ideia.' },
+    },
   })
   @ApiResponse(SwaggerResponses.badRequest)
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.notFound('Solicitação'))
   cancel(@Param('id') id: string, @CurrentUser() user: User, @Body('reason') reason?: string) {
-    return this.service.cancel(id, user.id, reason);
+    return this.service.cancel(id, user.id, reason)
   }
 }

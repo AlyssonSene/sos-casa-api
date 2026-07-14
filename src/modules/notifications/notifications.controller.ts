@@ -1,16 +1,10 @@
-import { Controller, Get, Patch, Param, UseGuards } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
-import { NotificationsService } from './notifications.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
-import { SwaggerResponses } from '../../common/swagger/responses';
+import { Controller, Get, Patch, Param, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger'
+import { NotificationsService } from './notifications.service'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { CurrentUser } from '../../common/decorators/current-user.decorator'
+import { User } from '../users/entities/user.entity'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 const NOTIFICATION_EXAMPLE = {
   id: 'uuid',
@@ -21,7 +15,7 @@ const NOTIFICATION_EXAMPLE = {
   data: { requestId: 'uuid' },
   readAt: null,
   createdAt: '2026-07-11T10:00:00.000Z',
-};
+}
 
 @ApiTags('notifications')
 @ApiBearerAuth()
@@ -42,7 +36,7 @@ export class NotificationsController {
   })
   @ApiResponse(SwaggerResponses.unauthorized)
   findAll(@CurrentUser() user: User) {
-    return this.service.findByUser(user.id);
+    return this.service.findByUser(user.id)
   }
 
   @Patch(':id/read')
@@ -56,7 +50,7 @@ export class NotificationsController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.notFound('Notificação'))
   markRead(@Param('id') id: string, @CurrentUser() user: User) {
-    return this.service.markRead(id, user.id);
+    return this.service.markRead(id, user.id)
   }
 
   @Patch('read-all')
@@ -64,6 +58,6 @@ export class NotificationsController {
   @ApiResponse({ status: 200, description: 'Todas as notificações marcadas como lidas.' })
   @ApiResponse(SwaggerResponses.unauthorized)
   markAllRead(@CurrentUser() user: User) {
-    return this.service.markAllRead(user.id);
+    return this.service.markAllRead(user.id)
   }
 }

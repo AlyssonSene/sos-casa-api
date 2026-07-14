@@ -47,4 +47,4 @@ export const SwaggerResponses = {
     status: 204,
     description: 'Operação realizada. Sem conteúdo no retorno.',
   },
-} as const;
+} as const

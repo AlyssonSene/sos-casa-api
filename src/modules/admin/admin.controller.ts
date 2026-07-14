@@ -1,10 +1,10 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
-import { SwaggerResponses } from '../../common/swagger/responses';
+import { Controller, Get, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { RolesGuard } from '../../common/guards/roles.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../../common/enums/role.enum'
+import { SwaggerResponses } from '../../common/swagger/responses'
 
 @ApiTags('admin')
 @ApiBearerAuth()
@@ -25,6 +25,6 @@ export class AdminController {
   @ApiResponse(SwaggerResponses.unauthorized)
   @ApiResponse(SwaggerResponses.forbidden)
   health() {
-    return { status: 'ok', timestamp: new Date().toISOString() };
+    return { status: 'ok', timestamp: new Date().toISOString() }
   }
 }

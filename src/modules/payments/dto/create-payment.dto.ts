@@ -1,11 +1,11 @@
-import { IsEnum, IsUUID, IsOptional, IsString } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaymentMethod } from '../entities/payment.entity';
+import { IsEnum, IsUUID, IsOptional, IsString } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { PaymentMethod } from '../entities/payment.entity'
 
 export class CreatePaymentDto {
   @ApiProperty({ description: 'UUID da solicitação de serviço' })
   @IsUUID()
-  requestId: string;
+  requestId: string
 
   @ApiProperty({
     enum: PaymentMethod,
@@ -14,7 +14,7 @@ export class CreatePaymentDto {
       '`manual_pix` para pagamento direto à chave PIX do profissional.',
   })
   @IsEnum(PaymentMethod)
-  method: PaymentMethod;
+  method: PaymentMethod
 
   /**
    * Apenas para método `stripe_card` / `stripe_pix`:
@@ -23,5 +23,5 @@ export class CreatePaymentDto {
   @ApiPropertyOptional({ description: 'Stripe PaymentMethod ID (apenas para métodos Stripe)' })
   @IsOptional()
   @IsString()
-  stripePaymentMethodId?: string;
+  stripePaymentMethodId?: string
 }

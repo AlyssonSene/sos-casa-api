@@ -1,51 +1,43 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToOne,
-  OneToMany,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
-import { Role } from '../../../common/enums/role.enum';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { Exclude } from 'class-transformer'
+import { Role } from '../../../common/enums/role.enum'
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column({ length: 150 })
-  name: string;
+  name: string
 
   @Column({ unique: true, length: 255 })
-  email: string;
+  email: string
 
   @Column({ unique: true, length: 20 })
-  phone: string;
+  phone: string
 
   @Exclude()
   @Column({ name: 'password_hash' })
-  passwordHash: string;
+  passwordHash: string
 
   @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
-  role: Role;
+  role: Role
 
   @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
-  avatarUrl: string | null;
+  avatarUrl: string | null
 
   @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ name: 'email_verified', default: false })
-  emailVerified: boolean;
+  emailVerified: boolean
 
   @Column({ name: 'phone_verified', default: false })
-  phoneVerified: boolean;
+  phoneVerified: boolean
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt: Date
 }
