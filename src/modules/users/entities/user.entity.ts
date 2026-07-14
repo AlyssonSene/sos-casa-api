@@ -31,7 +31,7 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
   role: Role;
 
-  @Column({ name: 'avatar_url', nullable: true })
+  @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
   @Column({ name: 'is_active', default: true })

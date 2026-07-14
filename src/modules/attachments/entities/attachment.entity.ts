@@ -8,8 +8,8 @@ export class Attachment {
   @Column({ name: 'entity_id' }) entityId: string;
   @Column({ length: 30 }) type: string;
   @Column({ type: 'text' }) url: string;
-  @Column({ nullable: true, length: 255 }) filename: string | null;
-  @Column({ name: 'size_bytes', nullable: true }) sizeBytes: number | null;
+  @Column({ type: 'varchar', nullable: true, length: 255 }) filename: string | null;
+  @Column({ name: 'size_bytes', type: 'integer', nullable: true }) sizeBytes: number | null;
   @CreateDateColumn({ name: 'created_at' }) createdAt: Date;
   @UpdateDateColumn({ name: 'updated_at' }) updatedAt: Date;
 }

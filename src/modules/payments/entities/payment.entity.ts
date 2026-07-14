@@ -27,23 +27,23 @@ export class Payment {
   @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.PENDING }) status: PaymentStatus;
 
   // ── Stripe (stripe_card / stripe_pix) ─────────────────────────────────────
-  @Column({ name: 'stripe_payment_intent_id', nullable: true, length: 100 }) stripePaymentIntentId: string | null;
+  @Column({ name: 'stripe_payment_intent_id', type: 'varchar', nullable: true, length: 100 }) stripePaymentIntentId: string | null;
   @Column({ name: 'stripe_client_secret', nullable: true, type: 'text' }) stripeClientSecret: string | null;
-  @Column({ name: 'stripe_charge_id', nullable: true, length: 100 }) stripeChargeId: string | null;
+  @Column({ name: 'stripe_charge_id', type: 'varchar', nullable: true, length: 100 }) stripeChargeId: string | null;
 
   // ── PIX manual ────────────────────────────────────────────────────────────
   /** Snapshot da chave PIX do profissional no momento do pagamento */
-  @Column({ name: 'manual_pix_key', nullable: true, length: 255 }) manualPixKey: string | null;
-  @Column({ name: 'manual_pix_key_type', nullable: true, length: 20 }) manualPixKeyType: string | null;
+  @Column({ name: 'manual_pix_key', type: 'varchar', nullable: true, length: 255 }) manualPixKey: string | null;
+  @Column({ name: 'manual_pix_key_type', type: 'varchar', nullable: true, length: 20 }) manualPixKeyType: string | null;
   /** UUID do attachment com o comprovante enviado pelo cliente */
-  @Column({ name: 'receipt_attachment_id', nullable: true }) receiptAttachmentId: string | null;
+  @Column({ name: 'receipt_attachment_id', type: 'uuid', nullable: true }) receiptAttachmentId: string | null;
   /** Quando o profissional confirmou o recebimento */
-  @Column({ name: 'professional_confirmed_at', nullable: true }) professionalConfirmedAt: Date | null;
+  @Column({ name: 'professional_confirmed_at', type: 'timestamp', nullable: true }) professionalConfirmedAt: Date | null;
 
   // ── Timestamps financeiros ─────────────────────────────────────────────────
-  @Column({ name: 'paid_at', nullable: true }) paidAt: Date | null;
-  @Column({ name: 'held_at', nullable: true }) heldAt: Date | null;
-  @Column({ name: 'released_at', nullable: true }) releasedAt: Date | null;
+  @Column({ name: 'paid_at', type: 'timestamp', nullable: true }) paidAt: Date | null;
+  @Column({ name: 'held_at', type: 'timestamp', nullable: true }) heldAt: Date | null;
+  @Column({ name: 'released_at', type: 'timestamp', nullable: true }) releasedAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' }) createdAt: Date;
   @UpdateDateColumn({ name: 'updated_at' }) updatedAt: Date;

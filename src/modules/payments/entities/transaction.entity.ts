@@ -19,10 +19,10 @@ export class Transaction {
   @Column({ name: 'net_amount', type: 'decimal', precision: 10, scale: 2 }) netAmount: number;
 
   /** ID da transferência no Stripe Connect (null para PIX manual — sem comissão automática) */
-  @Column({ name: 'stripe_transfer_id', nullable: true, length: 100 }) stripeTransferId: string | null;
+  @Column({ name: 'stripe_transfer_id', type: 'varchar', nullable: true, length: 100 }) stripeTransferId: string | null;
 
   @Column({ type: 'enum', enum: TransactionStatus, default: TransactionStatus.PENDING }) status: TransactionStatus;
-  @Column({ name: 'transferred_at', nullable: true }) transferredAt: Date | null;
+  @Column({ name: 'transferred_at', type: 'timestamp', nullable: true }) transferredAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' }) createdAt: Date;
   @UpdateDateColumn({ name: 'updated_at' }) updatedAt: Date;

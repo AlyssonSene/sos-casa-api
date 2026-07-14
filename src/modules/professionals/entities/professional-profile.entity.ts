@@ -23,8 +23,8 @@ export class ProfessionalProfile {
   @Column({ name: 'user_id' }) userId: string;
 
   // ── Documentos ─────────────────────────────────────────────────────────────
-  @Column({ nullable: true, length: 14 }) cpf: string | null;
-  @Column({ nullable: true, length: 18 }) cnpj: string | null;
+  @Column({ type: 'varchar', nullable: true, length: 14 }) cpf: string | null;
+  @Column({ type: 'varchar', nullable: true, length: 18 }) cnpj: string | null;
 
   // ── Perfil ─────────────────────────────────────────────────────────────────
   @Column({ nullable: true, type: 'text' }) description: string | null;
@@ -37,8 +37,8 @@ export class ProfessionalProfile {
 
   // ── Aprovação ──────────────────────────────────────────────────────────────
   @Column({ name: 'approval_status', type: 'enum', enum: ApprovalStatus, default: ApprovalStatus.PENDING }) approvalStatus: ApprovalStatus;
-  @Column({ name: 'approved_at', nullable: true }) approvedAt: Date | null;
-  @Column({ name: 'approved_by', nullable: true }) approvedBy: string | null;
+  @Column({ name: 'approved_at', type: 'timestamp', nullable: true }) approvedAt: Date | null;
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true }) approvedBy: string | null;
 
   // ── Avaliações ─────────────────────────────────────────────────────────────
   @Column({ name: 'avg_rating', type: 'decimal', precision: 3, scale: 2, default: 0 }) avgRating: number;
@@ -46,11 +46,11 @@ export class ProfessionalProfile {
 
   // ── Stripe Connect (para split automático via Stripe) ──────────────────────
   /** ID da conta conectada no Stripe — preenchida após onboarding do profissional */
-  @Column({ name: 'stripe_account_id', nullable: true, length: 100 }) stripeAccountId: string | null;
+  @Column({ name: 'stripe_account_id', type: 'varchar', nullable: true, length: 100 }) stripeAccountId: string | null;
 
   // ── PIX manual ─────────────────────────────────────────────────────────────
   /** Chave PIX do profissional para recebimento direto */
-  @Column({ name: 'pix_key', nullable: true, length: 255 }) pixKey: string | null;
+  @Column({ name: 'pix_key', type: 'varchar', nullable: true, length: 255 }) pixKey: string | null;
   @Column({ name: 'pix_key_type', type: 'enum', enum: PixKeyType, nullable: true }) pixKeyType: PixKeyType | null;
 
   @CreateDateColumn({ name: 'created_at' }) createdAt: Date;

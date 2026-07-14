@@ -13,15 +13,30 @@ const ESCROW_HOURS   = 24; // horas após confirmação do cliente para liberar 
 @Injectable()
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
-  private readonly stripe: Stripe;
+  private _stripe: Stripe | null = null;
 
   constructor(
     @InjectRepository(Payment)     private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(Transaction) private readonly txRepo: Repository<Transaction>,
     private readonly config: ConfigService,
   ) {
-    const secretKey = this.config.get<string>('app.stripe.secretKey') ?? 'sk_test_placeholder';
-    this.stripe = new Stripe(secretKey, { apiVersion: '2026-06-24.dahlia' });
+    const secretKey = this.config.get<string>('app.stripe.secretKey') || '';
+    if (secretKey) {
+      this._stripe = new Stripe(secretKey, { apiVersion: '2026-06-24.dahlia' });
+      this.logger.log('[Stripe] SDK inicializado');
+    } else {
+      this.logger.warn('[Stripe] STRIPE_SECRET_KEY não configurado — pagamentos via Stripe desabilitados');
+    }
+  }
+
+  /** Lança erro descritivo se Stripe não estiver configurado */
+  private get stripe(): Stripe {
+    if (!this._stripe) {
+      throw new BadRequestException(
+        'Stripe não configurado. Defina STRIPE_SECRET_KEY no .env para usar pagamentos via cartão ou PIX automático.',
+      );
+    }
+    return this._stripe;
   }
 
   // ────────────────────────────────────────────────────────────────────────────

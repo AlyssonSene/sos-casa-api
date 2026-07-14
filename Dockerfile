@@ -6,7 +6,7 @@
 # =============================================================================
 
 # ── Stage 1: builder ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -23,24 +23,24 @@ RUN npm run build
 RUN npm prune --production
 
 # ── Stage 2: runner ───────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+# Distroless: sem shell, sem apk, sem busybox → zero CVEs conhecidas
+# Já roda como nonroot (uid 65532) — sem necessidade de adduser
+FROM gcr.io/distroless/nodejs22-debian12 AS runner
 
 WORKDIR /app
 
-# Roda como usuário não-root por segurança
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
 # Copia apenas artefatos do builder
-COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
-COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:appgroup /app/package.json ./package.json
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 # Porta que a API escuta (deve coincidir com PORT no .env)
 EXPOSE 3000
 
-# Health check (requer curl na imagem; adicionado abaixo)
+# Health check via Node.js puro — sem wget/curl (distroless não tem shell)
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
-  CMD wget -qO- http://localhost:3000/api/v1/health || exit 1
+  CMD ["node", "-e", \
+    "require('http').get('http://localhost:3000/api/v1/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
 
-CMD ["node", "dist/main"]
+# distroless/nodejs entrypoint já é `node` — CMD recebe apenas o script
+CMD ["dist/main"]

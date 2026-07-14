@@ -6,10 +6,10 @@ export class Address {
   @PrimaryGeneratedColumn('uuid') id: string;
   @ManyToOne(() => User, { onDelete: 'CASCADE' }) @JoinColumn({ name: 'user_id' }) user: User;
   @Column({ name: 'user_id' }) userId: string;
-  @Column({ nullable: true, length: 50 }) label: string | null;
+  @Column({ type: 'varchar', nullable: true, length: 50 }) label: string | null;
   @Column({ length: 255 }) street: string;
   @Column({ length: 20 }) number: string;
-  @Column({ nullable: true, length: 100 }) complement: string | null;
+  @Column({ type: 'varchar', nullable: true, length: 100 }) complement: string | null;
   @Column({ length: 100 }) neighborhood: string;
   @Column({ length: 100 }) city: string;
   @Column({ type: 'char', length: 2 }) state: string;
